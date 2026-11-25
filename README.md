@@ -51,7 +51,11 @@ La IA se utilizó para interpretar la guía, revisar la referencia visual de Fig
 
 ## Repositorio
 
-Esta carpeta incluye un repositorio Git local con commits por avance. No se ha publicado un repositorio remoto.
+Repositorio publicado: https://github.com/luisgustavosalcedo53-sys/Laboratorio14-Widgets-Glance
+
+La rama `main` conserva los commits de configuración, widget guiado, widget personalizado y corrección del estado observable de Glance. El historial puede revisarse en https://github.com/luisgustavosalcedo53-sys/Laboratorio14-Widgets-Glance/commits/main/
+
+Archivos principales: `app/build.gradle.kts` contiene las dependencias; `AndroidManifest.xml` registra actividades y proveedores; `SimpleWidget.kt` implementa los dos accesos; `DispensaludWidget.kt` sincroniza el estado y ejecuta la acción; `MainActivity.kt` contiene las pantallas y la persistencia de demostración.
 
 ## Verificación realizada
 
