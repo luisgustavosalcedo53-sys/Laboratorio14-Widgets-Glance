@@ -70,7 +70,7 @@ class MedicamentosActivity : ComponentActivity() {
                 Button(onClick = {
                     completed = true
                     DemoStore.setCompleted(this@MedicamentosActivity, true)
-                    lifecycleScope.launch { DispensaludWidget().updateAll(this@MedicamentosActivity) }
+                    lifecycleScope.launch { refreshWidgets(this@MedicamentosActivity) }
                 }, enabled = !completed, modifier = Modifier.fillMaxWidth()) { Text(if (completed) "Completado" else "Marcar como realizado") }
                 OutlinedButton(onClick = { startActivity(Intent(this@MedicamentosActivity, HistorialActivity::class.java)) }, modifier = Modifier.fillMaxWidth()) { Text("Ver historial") }
                 TextButton(onClick = { finish() }) { Text("Volver") }
@@ -90,7 +90,7 @@ class HistorialActivity : ComponentActivity() {
                 OutlinedButton(onClick = {
                     DemoStore.setCompleted(this@HistorialActivity, false)
                     completed = false
-                    lifecycleScope.launch { DispensaludWidget().updateAll(this@HistorialActivity) }
+                    lifecycleScope.launch { refreshWidgets(this@HistorialActivity) }
                 }, modifier = Modifier.fillMaxWidth()) { Text("Reiniciar demostración") }
                 TextButton(onClick = { finish() }) { Text("Volver") }
             }

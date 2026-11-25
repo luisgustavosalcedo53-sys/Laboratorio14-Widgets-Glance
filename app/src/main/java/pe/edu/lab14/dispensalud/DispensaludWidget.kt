@@ -14,15 +14,31 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.state.PreferencesGlanceStateDefinition
+
+val CompletedKey = booleanPreferencesKey("completed")
+
+suspend fun refreshWidgets(context: Context) {
+    val completed = DemoStore.completed(context)
+    GlanceAppWidgetManager(context).getGlanceIds(DispensaludWidget::class.java).forEach { id ->
+        updateAppWidgetState(context, id) { preferences -> preferences[CompletedKey] = completed }
+    }
+    DispensaludWidget().updateAll(context)
+}
 
 class DispensaludWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = DispensaludWidget()
 }
 
 class DispensaludWidget : GlanceAppWidget() {
+    override val stateDefinition = PreferencesGlanceStateDefinition
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val completed = DemoStore.completed(context)
+        val initialCompleted = DemoStore.completed(context)
         provideContent {
+            val completed = currentState<Preferences>()[CompletedKey] ?: initialCompleted
             GlanceTheme {
                 Column(
                     GlanceModifier.fillMaxSize().background(Color(0xFFE1F1E7)).appWidgetBackground().cornerRadius(28.dp).padding(16.dp),
@@ -34,7 +50,7 @@ class DispensaludWidget : GlanceAppWidget() {
                     Spacer(GlanceModifier.height(6.dp))
                     Text(if (completed) "1 de 1 realizado · Revisa tu historial" else "08:00 · Recordatorio de ejemplo", style = TextStyle(color = ColorProvider(Color(0xFF264C3D)), fontSize = 14.sp))
                     Spacer(GlanceModifier.height(12.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Button(if (completed) "Ver registro" else "Realizado", onClick = if (completed) actionStartActivity<HistorialActivity>() else actionRunCallback<CompleteReminder>(), modifier = GlanceModifier.defaultWeight())
                         Spacer(GlanceModifier.width(8.dp))
                         Button("Mi rutina", actionStartActivity<MedicamentosActivity>(), modifier = GlanceModifier.defaultWeight())
@@ -49,6 +65,6 @@ class CompleteReminder : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         // Idempotente: varios toques mantienen un único registro de demostración.
         DemoStore.setCompleted(context, true)
-        DispensaludWidget().updateAll(context)
+        refreshWidgets(context)
     }
 }
